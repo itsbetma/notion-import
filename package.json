@@ -1,5 +1,5 @@
 {
-  "name": "notion-import",
+  "name": "notion-api",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -12,7 +12,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@notionhq/client": "^2.2.14",
+    "@notionhq/client": "^2.3.0",
+    "clipboardy": "^5.0.0",
     "csv": "^6.3.6",
     "dotenv": "^16.3.1"
   },

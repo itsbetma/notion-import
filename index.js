@@ -1,4 +1,5 @@
 import { config } from 'dotenv';
+import clipboardy from 'clipboardy';
 
 config();
 
@@ -7,40 +8,57 @@ import { Client } from '@notionhq/client';
 const notion = new Client({ auth: process.env.NOTION_API_KEY });
 
 // Replace with your actual database ID
-const DATABASE_ID = process.env.DATABASE;
+const DATABASE_ID = '54ccead7fc4449729224ef01460c97a5'; // NOTE: Work Planner
 
 export async function getLastItem() {
   const response = await notion.databases.query({
     database_id: DATABASE_ID,
     filter: {
-      property: 'Name', // must match the title property name in your database
-      title: {
-        contains: '_Goal & Minor Tasks', // or 'equals' if you want exact match
-      },
+      and: [
+        {
+          property: 'Reminder',
+          date: {
+            on_or_after: '2025-10-27',
+          },
+        },
+        {
+          property: 'Reminder',
+          date: {
+            on_or_before: '2025-10-31',
+          },
+        },
+        {
+          property: 'Name', // must match the title property name in your database
+          title: {
+            contains: '_Goal & Minor Tasks', // or 'equals' if you want exact match
+          },
+        },
+      ],
     },
     sorts: [
       {
         timestamp: 'created_time',
-        direction: 'descending',
+        direction: 'ascending',
       },
     ],
-    page_size: 1, // only get the latest one
+    page_size: 99, // only get the latest one
   });
 
   return response.results;
 }
 
 // Example usage
-const lastItem = getLastItem()
+getLastItem()
   .then(async (items) => {
     if (!items) {
-      console.log('No items found.');
+      console.error('No items found.');
       return;
     }
+    let data = '';
     for (const item of items) {
       const date = item.properties.Reminder.date.start;
-      const title = item.properties['Name'].title[0].plain_text;
-      console.log('\n\nTitle:', title);
+      const hoursWorked = item.properties.Hours.number;
+
       const blocks = await notion.blocks.children.list({
         block_id: item.id,
       });
@@ -73,7 +91,18 @@ const lastItem = getLastItem()
         if (text) finalItems.push(text);
       }
 
-      console.log(date, `\t`, `Crystal Website`, `\t`, finalItems.join('; '));
+      data =
+        data +
+        [
+          date,
+          hoursWorked ? String(hoursWorked) : '0',
+          'Crystal',
+          'Crystal - Website',
+          finalItems.join('; '),
+        ]
+          .join('\t')
+          .concat('\n');
     }
+    await clipboardy.write(data);
   })
   .catch((err) => console.error(err));

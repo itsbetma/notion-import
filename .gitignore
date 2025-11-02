@@ -3,3 +3,4 @@ package-lock.json
 /notion-sdk-js
 .env
 /csv/*
+.DS_STORE
