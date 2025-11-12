@@ -21,13 +21,13 @@ export async function getData() {
         {
           property: 'Reminder',
           date: {
-            on_or_after: `2025-10-${from}`,
+            on_or_after: `${from}`,
           },
         },
         {
           property: 'Reminder',
           date: {
-            on_or_before: `2025-10-${to}`,
+            on_or_before: `${to}`,
           },
         },
         {
@@ -51,15 +51,7 @@ export async function getData() {
 }
 
 async function main() {
-  if (
-    !from ||
-    !to ||
-    Number.isNaN(from) ||
-    Number.isNaN(to) ||
-    Number(from) > Number(to) ||
-    Number(from) <= 0 ||
-    Number(to) > 31
-  ) {
+  if (!from || !to) {
     console.debug('Please provide valid dates.');
     return;
   }
