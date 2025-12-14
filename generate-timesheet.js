@@ -93,15 +93,19 @@ async function main() {
     const finalItems = [];
 
     for (const block of newBlocks) {
-      if (block.type !== 'to_do' || !block['to_do']?.checked) {
-        continue;
-      }
-
       const text = block[block.type]?.rich_text
         ?.map((r) => r.plain_text)
         .join(' -- ')
         .replace(/--.*--/, '')
         .trim();
+
+      if (
+        block.type !== 'to_do' ||
+        !block['to_do']?.checked ||
+        String(text).toLocaleLowerCase().trim() === 'meeting notes'
+      ) {
+        continue;
+      }
 
       if (text) finalItems.push(text);
     }
